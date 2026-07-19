@@ -5,6 +5,18 @@ const port = browser.runtime.connectNative(nativeAppName)
 
 const receivedPerTab = {}
 
+// hardcode options
+const config = ({
+  editor: 'custom',
+  shell: 'sh',
+  template: '/usr/bin/env kitty --start-as=normal --override=macos_quit_when_last_window_closed=yes -- /usr/bin/env nvim "/path/to/temp.eml"',
+  suppressHelpHeaders: true,
+  temporaryDirectory: '',
+  metaHeaders: false,
+  allowCustomHeaders: false,
+  bypassVersionCheck: false,
+})
+
 async function commandListener(command) {
   console.debug(`${manifest.short_name} command: ${command}`)
   switch (command) {
@@ -88,7 +100,7 @@ async function composeActionListener(tab, info) {
   if (!await messenger.composeAction.isEnabled({tabId: tab.id})) {
     return
   }
-  const settings = await browser.storage.local.get(['editor', 'shell', 'template', 'temporaryDirectory', 'suppressHelpHeaders', 'metaHeaders', 'allowCustomHeaders', 'bypassVersionCheck'])
+  const settings = config
   if (!settings.editor) {
     await createBasicNotification(
       'no-settings',
@@ -141,7 +153,7 @@ async function nativeMessagingListener(response) {
     await browser.storage.local.set({
       healthy: response.ping === response.pong,
     })
-    const settings = await browser.storage.local.get(['bypassVersionCheck'])
+    const settings = config
     if (!response.compatible && !settings.bypassVersionCheck) {
       let message = ''
       if (response.hostVersion) {

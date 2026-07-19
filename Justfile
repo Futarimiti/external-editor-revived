@@ -74,4 +74,10 @@ pack_ext:
     rm -f ./external-editor-revived.xpi
     pushd ./extension && zip -r -FS ../external-editor-revived.xpi *
 
+dest := '~/Library/Thunderbird/Profiles/futar/extensions/external-editor-revived@tsundere.moe.xpi'
+
+install_ext: pack_ext
+    rm -f {{dest}}
+    cp external-editor-revived.xpi {{dest}}
+
 # vim: set filetype=just :
